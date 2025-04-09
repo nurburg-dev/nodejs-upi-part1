@@ -1,39 +1,39 @@
-version: '3.8'
 
+version: '3.9'
 services:
-  app:
-    build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
-    container_name: nodejs-upi-app
+  web:
+
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    
     volumes:
-      - ../:/workspace:cached
+      - ..:/workspace:cached
+
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: data
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      
+    command: sleep infinity
+
     depends_on:
       - db
-    environment:
-      - POSTGRES_HOST=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=mydb
-    networks:
-      - app-network
+
+    links:
+      - db:db
 
   db:
-    image: postgres:16
-    container_name: nodejs-upi-db
-    restart: always
+    image: postgres:14-alpine
+    restart: unless-stopped
+    ports: 
+      - 5432:5432
+    command: postgres -c password_encryption=md5
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=mydb
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  postgres_data:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_INITDB_ARGS: "--auth-local=md5"
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: data

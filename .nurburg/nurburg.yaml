@@ -1,0 +1,15 @@
+NurburgKind: SERVICE
+Name: monolith-service
+Replicas: 2
+Port: 3000
+MemoryMiB: 256
+CPU: 1
+Env:
+  TEST_ENV_VAR: VALUE
+---
+NurburgKind: POSTGRES
+Name: postgres-test
+---
+NurburgKind: K6LOAD
+Name: load-test
+File: .nurburg/load.js
